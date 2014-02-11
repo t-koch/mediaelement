@@ -33,14 +33,14 @@
 			});
 			// Trigger Resize Event when entering or leaving Fullscreen Mode
 			player.fullscreenBtn.bind("click", function(){ $(window).trigger('resize'); });
-			// Choose an appropriate source (current implementation: prevent upscaling of small videos)
+			// Choose an appropriate source
 			$(window).bind('resized ready', function() {
 				// Check for 'media.clientHeight', 'media.height' may not be correct in fullscreen mode
 				h = media.clientHeight
-				// No Sources with tag, or not initialized?
-				if ( (player.adaptiveSources.length == 0) || (h <= 0) ) return;
-				for (i=0; i<player.adaptiveSources.length; i++) {
-					if (h <= player.adaptiveSources[i].height) {
+				// Not enough adaptive sources, or not initialized?
+				if ( (player.adaptiveSources.length < 2) || (h <= 0) ) return;
+				for (i=0; i<player.adaptiveSources.length-1; i++) {
+					if (h < ( ( parseInt(player.adaptiveSources[i].height, 10) + parseInt(player.adaptiveSources[i+1].height, 10) ) / 2 ) ) {
 						//TODO Also check for Mimetype
 						return player.adaptiveSources[i].el.click();
 					}
