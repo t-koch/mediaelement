@@ -15,8 +15,19 @@
 					sourceHeight = $(src).attr('data-video-height')
 					// Take only sources in account which use the custom tag
 					if (sourceHeight) {
-						relatedSourceChooserElement = player.sourcechooserButton.find('#'+player.id+'_sourcechooser_'+src.title+src.type.split('/')[1]);
-						player.adaptiveSources.push({src:src.src, type:src.type, height:sourceHeight, el:relatedSourceChooserElement});
+						sourceType = src.type.split('/')[1]
+						relatedSourceChooserElement = player.sourcechooserButton.find('#'+player.id+'_sourcechooser_'+src.title+sourceType);
+						var foundHeight = false;
+						for(j=0; j<player.adaptiveSources.length; j++) {
+						  if(player.adaptiveSources[j].height == sourceHeight)
+						  {
+						    player.adaptiveSources[j].srcs.push({src:src.src, type:sourceType, el:relatedSourceChooserElement});
+						    foundHeight = true;
+						    break;
+						  }
+						}
+						if(!foundHeight)
+						  player.adaptiveSources.push( { height:sourceHeight, srcs: new Array({src:src.src, type:sourceType, el:relatedSourceChooserElement}) } );
 					}
 				}
 			}
@@ -37,16 +48,25 @@
 			$(window).bind('resized ready', function() {
 				// Check for 'media.clientHeight', 'media.height' may not be correct in fullscreen mode
 				h = media.clientHeight
+				// The media element doesn't know MimeTypes, but the file extension should be the same
+				currentType = media.currentSrc.split('.').pop()
 				// Not enough adaptive sources, or not initialized?
 				if ( (player.adaptiveSources.length < 2) || (h <= 0) ) return;
 				for (i=0; i<player.adaptiveSources.length-1; i++) {
 					if (h < ( ( parseInt(player.adaptiveSources[i].height, 10) + parseInt(player.adaptiveSources[i+1].height, 10) ) / 2 ) ) {
-						//TODO Also check for Mimetype
-						return player.adaptiveSources[i].el.click();
+						for (j=0; j<player.adaptiveSources[i].srcs.length; j++)
+						  if ( player.adaptiveSources[i].srcs[j].type == currentType )
+						    return player.adaptiveSources[i].srcs[j].el.click();
+						// Didn't find MimeType in this resolution, so use another playable file
+						return player.adaptiveSources[i].srcs[0].el.click();
 					}
 				}
 				// Change to the best quality if nothing else fits
-				return player.adaptiveSources[player.adaptiveSources.length-1].el.click();
+				for (j=0; j<player.adaptiveSources[player.adaptiveSources.length-1].srcs.length; j++)
+				  if ( player.adaptiveSources[i].srcs[j].type == currentType )
+				    return player.adaptiveSources[i].srcs[j].el.click();
+				// Didn't find MimeType in this resolution, so use another playable file
+				return player.adaptiveSources[player.adaptiveSources.length-1].srcs[0].el.click();
 				});
 		}
 	});
