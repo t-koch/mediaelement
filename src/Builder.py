@@ -1,3 +1,5 @@
+#!/bin/python
+
 import sys
 import os
 import shutil
@@ -23,7 +25,7 @@ me_files.append('me-mediaelements.js')
 me_files.append('me-shim.js')
 me_files.append('me-i18n.js')
 me_files.append('me-i18n-locale-de.js')
-me_files.append('me-i18n-locale-zh.js')
+#me_files.append('me-i18n-locale-zh.js')
 
 code = ''
 
@@ -52,7 +54,8 @@ mep_files.append('mep-feature-fullscreen.js')
 mep_files.append('mep-feature-tracks.js')
 mep_files.append('mep-feature-contextmenu.js')
 mep_files.append('mep-feature-postroll.js')
-# mep_files.append('mep-feature-sourcechooser.js')
+mep_files.append('mep-feature-sourcechooser.js')
+mep_files.append('mep-feature-adaptivesourcechooser.js')
 
 code = ''
 
